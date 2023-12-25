@@ -32,6 +32,8 @@ public class FiveChessFrame extends JFrame implements MouseListener
 	boolean isBlack=true;
 	//标记游戏是否可以继续
 	boolean canPlay=true;
+	//保存显示信息
+	String message="黑方先行";
 	BufferedImage bgImage=null;
 	public FiveChessFrame()
 	{
@@ -72,16 +74,20 @@ public class FiveChessFrame extends JFrame implements MouseListener
 	@Override
 	public void paint(Graphics g)
 	{
+		//双缓冲技术防止屏幕闪烁
+		 BufferedImage bi=new BufferedImage(645,484,BufferedImage.TYPE_INT_ARGB);
+		 Graphics g2=bi.createGraphics();
 		//绘制背景
 		super.paint(g); 
-		g.drawImage(bgImage, 0, 0,this);
+		g2.drawImage(bgImage, 0, 0,this);
 		//输出标题信息
-		g.setFont(new Font("黑体",Font.BOLD,20));
-		g.drawString("游戏信息",50,55);
+		g2.setColor(Color.black);
+		g2.setFont(new Font("黑体",Font.BOLD,20));
+		g2.drawString("游戏信息:"+message,50,55);
 		//输出时间信息
-		g.setFont(new Font("宋体",Font.BOLD,15));
-		g.drawString("黑方时间：无限制",455,70);
-		g.drawString("白方时间：无限制",455,100);
+		g2.setFont(new Font("宋体",Font.BOLD,15));
+		g2.drawString("黑方时间：无限制",455,70);
+		g2.drawString("白方时间：无限制",455,100);
 		//绘制棋盘
 		Graphics2D g2d=(Graphics2D) g;
 		gap=405/(num+1);
@@ -91,18 +97,18 @@ public class FiveChessFrame extends JFrame implements MouseListener
 		float hueFloat = (float) hue;
 		float saturationFloat = (float) saturation;
 		float brightnessFloat = (float) brightness;
-		g2d.setColor(Color.getHSBColor(hueFloat, saturationFloat, brightnessFloat));
-		g2d.fillRect(42, 60, gap*(num+1), gap*(num+1));
+		g2.setColor(Color.getHSBColor(hueFloat, saturationFloat, brightnessFloat));
+		g2.fillRect(42, 60, gap*(num+1), gap*(num+1));
 		for(int i=0;i<this.num;i++)
 		{
-			g2d.setColor(Color.black);
-			g2d.setStroke(new BasicStroke(1));//设置棋盘线条粗细
+			g2.setColor(Color.black);
+			((Graphics2D) g2).setStroke(new BasicStroke(1));//设置棋盘线条粗细
 			if(i==0||i==num-1)
 			{
-				g2d.setStroke(new BasicStroke(2));
+				((Graphics2D) g2).setStroke(new BasicStroke(2));
 			}
-			g.drawLine(42+gap,60+(i*gap)+gap,42+(gap*num),60+(i*gap)+gap);//画横线
-			g.drawLine(42+(i*gap)+gap,60+gap,42+(i*gap)+gap,60+(gap*num));
+			g2.drawLine(42+gap,60+(i*gap)+gap,42+(gap*num),60+(i*gap)+gap);//画横线
+			g2.drawLine(42+(i*gap)+gap,60+gap,42+(i*gap)+gap,60+(gap*num));
 		}
 		//绘制落子
 		int chessPieceRadius=(int) (gap*0.85);
@@ -112,16 +118,17 @@ public class FiveChessFrame extends JFrame implements MouseListener
 			{
 				if(allChess[i][j]==1)
 				{
-					g2d.setColor(Color.black);
-					g.fillOval(42+gap/2+(gap*i)+1,60+gap/2+(gap*j)+1 , chessPieceRadius, chessPieceRadius);
+					g2.setColor(Color.black);
+					g2.fillOval(42+gap/2+(gap*i)+1,60+gap/2+(gap*j)+1 , chessPieceRadius, chessPieceRadius);
 				}
 				if(allChess[i][j]==2)
 				{
-					g2d.setColor(Color.white);
-					g.fillOval(42+gap/2+(gap*i)+1, 60+gap/2+(gap*j)+1, chessPieceRadius, chessPieceRadius);
+					g2.setColor(Color.white);
+					g2.fillOval(42+gap/2+(gap*i)+1, 60+gap/2+(gap*j)+1, chessPieceRadius, chessPieceRadius);
 				}
 			}
 		}
+		g.drawImage(bi,0,0,this);
 	}
 	@Override
 	public void mouseClicked(MouseEvent e) {
@@ -148,18 +155,21 @@ public class FiveChessFrame extends JFrame implements MouseListener
 					{
 						allChess[x][y]=1;
 						isBlack=false;
+						message="轮到白方";
 					}
 					else
 					{
 						allChess[x][y]=2;
 						isBlack=true;
+						message="轮到黑方";
 					}
-					this.repaint();//表示重新调用pait方法
+					this.repaint();//表示重新调用paint方法
 					boolean isWin=this.checkWin();
 					if(isWin)
 					{
 						JOptionPane.showMessageDialog(this, "游戏结束，"+(allChess[x][y]==1?"黑方":"白方")+"获胜");
 						canPlay=false;
+						message="轮到黑方";
 					}
 				}
 				else
@@ -194,63 +204,76 @@ public class FiveChessFrame extends JFrame implements MouseListener
 	
 	public boolean checkWin() 
 	{
-		boolean flag=false;//判断默认未结束
-		//保存共有几个相同颜色的棋子相连
-		int count=1;
-		//判断横向是否有五个棋子相连
-		int color=allChess[x][y];
-		int i=1;
-		while(color==allChess[x+i][y]&&(x+i)<num)
-		{
-			count++;
-			i++;
-		}
-		i=1;
-		while(color==allChess[x-i][y]&&(x-i)>=0)
-		{
-			count++;
-			i++;
-		}
-		if(count>=5)
-		{
-			flag=true;
-		}
-		//判断纵向是否有五个棋子相连
-		int count2=1;
-		int i2=1;
-		while(color==allChess[x][y+i2]&&(y+i2)<num)
-		{
-			count2++;
-			i2++;
-		}
-		i2=1;
-		while(color==allChess[x][y-i2]&&(y-i2)>=0)
-		{
-			count2++;
-			i2++;
-		}
-		if(count2>=5)
-		{
-			flag=true;
-		}
-		//判断斜向是否有五个棋子相连
-		int count3=1;
-		int i3=1;
-		while(color==allChess[x+i3][y+i3]&&(y+i3)<num&&(x+i3)<num)
-		{
-			count3++;
-			i3++;
-		}
-		i3=1;
-		while(color==allChess[x-i3][y-i3]&&(y-i3)>=0&&(x-i3)>=0)
-		{
-			count3++;
-			i3++;
-		}
-		if(count3>=5)
-		{
-			flag=true;
-		}
-		return flag;
+	    boolean flag = false; // 判断默认未结束
+	    int color = allChess[x][y];
+	    
+	    // 判断横向
+	    // 保存共有几个相同颜色的棋子相连
+	    int count = 1;
+	    // 判断横向是否有五个棋子相连
+	    int i = 1;
+	    while (x + i < num && color == allChess[x + i][y]) {
+	        count++;
+	        i++;
+	    }
+	    i = 1;
+	    while (x - i >= 0 && color == allChess[x - i][y]) {
+	        count++;
+	        i++;
+	    }
+	    if (count >= 5) {
+	        flag = true;
+	    }
+	    
+	    // 判断纵向是否有五个棋子相连
+	    int count2 = 1;
+	    int i2 = 1;
+	    while (y + i2 < num && color == allChess[x][y + i2]) {
+	        count2++;
+	        i2++;
+	    }
+	    i2 = 1;
+	    while (y - i2 >= 0 && color == allChess[x][y - i2]) {
+	        count2++;
+	        i2++;
+	    }
+	    if (count2 >= 5) {
+	        flag = true;
+	    }
+	    
+	    // 判断斜向是否有五个棋子相连
+	    int count3 = 1;
+	    int i3 = 1;
+	    while (x + i3 < num && y + i3 < num && color == allChess[x + i3][y + i3]) {
+	        count3++;
+	        i3++;
+	    }
+	    i3 = 1;
+	    while (x - i3 >= 0 && y - i3 >= 0 && color == allChess[x - i3][y - i3]) {
+	        count3++;
+	        i3++;
+	    }
+	    if (count3 >= 5) {
+	        flag = true;
+	    }
+	    
+	    int count4 = 1;
+	    int i4 = 1;
+	    while (x + i4 < num && y - i4 >= 0 && color == allChess[x + i4][y - i4]) {
+	        count4++;
+	        i4++;
+	    }
+	    i4 = 1;
+	    while (x - i4 >= 0 && y + i4 < num && color == allChess[x - i4][y + i4]) {
+	        count4++;
+	        i4++;
+	    }
+	    if (count4 >= 5) {
+	        flag = true;
+	    }
+	    
+	    return flag;
 	}
+	
 }
+ 
