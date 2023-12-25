@@ -89,7 +89,6 @@ public class FiveChessFrame extends JFrame implements MouseListener
 		g2.drawString("黑方时间：无限制",455,70);
 		g2.drawString("白方时间：无限制",455,100);
 		//绘制棋盘
-		Graphics2D g2d=(Graphics2D) g;
 		gap=405/(num+1);
 		double hue = 158.0;
 		double saturation = 0.30;
@@ -171,12 +170,59 @@ public class FiveChessFrame extends JFrame implements MouseListener
 						canPlay=false;
 						message="轮到黑方";
 					}
+					boolean isDogfall=this.checkDogfall();
+					if(isDogfall)
+					{
+						JOptionPane.showMessageDialog(this, "游戏结束，棋盘已满，平局。");
+						canPlay=false;
+						message="轮到黑方";
+					}
 				}
 				else
 				{
 					JOptionPane.showMessageDialog(this, "当前位置已有棋子，请重新落子：");
 				}
 			}
+		}
+		//点击 开始 按钮 重新开始新游戏
+		if(e.getX()>=453&&e.getX()<=585&&e.getY()>=133&&e.getY()<=171)
+		{
+			JOptionPane.showMessageDialog(this, "开始");
+		}
+		//点击 设置 按钮 设置倒计时
+		if(e.getX()>=453&&e.getX()<=585&&e.getY()>=187&&e.getY()<=226)
+		{
+			JOptionPane.showMessageDialog(this, "设置");
+		}
+		//点击 说明 按钮 用来说明游戏规则和操作
+		if(e.getX()>=453&&e.getX()<=585&&e.getY()>=244&&e.getY()<=279)
+		{
+			JOptionPane.showMessageDialog(this, "游戏规则：\r\n"
+					+ "落子顺序：黑方先下，轮流落子。\r\n"
+					+ "落子的位置：每一方将自己的棋子放在棋盘的任意交叉点上，一次只能下一个棋子。\r\n"
+					+ "目标：先在棋盘上形成五个相同颜色的棋子连成一条线（横、竖、斜线皆可）的一方获胜。\r\n"
+					+ "平局：如果棋盘填满而没有达到五子连线的胜利条件，则比赛以平局结束。");
+		}
+		//点击 认输 按钮
+		if(e.getX()>=453&&e.getX()<=585&&e.getY()>=293&&e.getY()<=330)
+		{
+			JOptionPane.showMessageDialog(this, "认输");
+		}
+		//点击 关于 按钮 显示程序的作者或者编写的单位信息
+		if(e.getX()>=453&&e.getX()<=585&&e.getY()>=342&&e.getY()<=378)
+		{
+			JOptionPane.showMessageDialog(this, "本游戏作者一定能在2024年看到苏打绿首场演唱会");
+		}
+		//点击 退出 按钮 结束程序
+		if(e.getX()>=453&&e.getX()<=585&&e.getY()>=388&&e.getY()<=426)
+		{
+			JOptionPane.showMessageDialog(this, "游戏结束了，早点洗洗睡哈。");
+			System.exit(0);
+		}
+		//点击 悔棋 按钮
+		if(e.getX()>=453&&e.getX()<=585&&e.getY()>=435&&e.getY()<=471)
+		{
+			JOptionPane.showMessageDialog(this, "悔棋");
 		}
 	}
 	@Override
@@ -271,9 +317,21 @@ public class FiveChessFrame extends JFrame implements MouseListener
 	    if (count4 >= 5) {
 	        flag = true;
 	    }
-	    
 	    return flag;
 	}
-	
+	public boolean checkDogfall()
+	{
+	    for(int m=0;m<num;m++)
+	    {
+	    	for(int n=0;n<num;n++)
+	    	{
+	    		if(allChess[n][m]==0)
+	    		{
+	    			return false;
+	    		}
+	    	}
+	    }
+	    return true;
+	}
 }
  
