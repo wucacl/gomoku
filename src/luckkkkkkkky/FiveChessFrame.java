@@ -30,6 +30,8 @@ public class FiveChessFrame extends JFrame implements MouseListener
 	int[][]allChess;
 	//标识当前下的是黑棋还是白棋
 	boolean isBlack=true;
+	//标记游戏是否可以继续
+	boolean canPlay=true;
 	BufferedImage bgImage=null;
 	public FiveChessFrame()
 	{
@@ -132,34 +134,41 @@ public class FiveChessFrame extends JFrame implements MouseListener
 		// TODO Auto-generated method stub
 		System.out.println("X"+e.getX());//获取鼠标点击的位置
 		System.out.println("Y"+e.getY());
-		x=e.getX();
-		y=e.getY();
-		if(x>=42+(gap/2)&&x<=42+(gap*(num+1))&&y>60+(gap/2)&&y<=60+(gap*(num+1)))
+		if(canPlay)
 		{
-			this.repaint();//表示重新调用pait方法
-			int i,j;
-			i=(x-42+(gap/2)+1)/gap-1;
-			j=(y-60+(gap/2)+1)/gap-1;
-			if(allChess[i][j]==0)
-			{
-				if(isBlack)
-				{
-					allChess[i][j]=1;
-					isBlack=false;
+			x=e.getX();
+			y=e.getY();
+			if(x>=42+(gap/2)&&x<=42+(gap*(num+1))&&y>60+(gap/2)&&y<=60+(gap*(num+1)))
+			{		
+				x=(x-42+(gap/2)+1)/gap-1;
+				y=(y-60+(gap/2)+1)/gap-1;
+				if(allChess[x][y]==0)
+				{//当前要下的棋子是什么颜色
+					if(isBlack)
+					{
+						allChess[x][y]=1;
+						isBlack=false;
+					}
+					else
+					{
+						allChess[x][y]=2;
+						isBlack=true;
+					}
+					this.repaint();//表示重新调用pait方法
+					boolean isWin=this.checkWin();
+					if(isWin)
+					{
+						JOptionPane.showMessageDialog(this, "游戏结束，"+(allChess[x][y]==1?"黑方":"白方")+"获胜");
+						canPlay=false;
+					}
 				}
 				else
 				{
-					allChess[i][j]=2;
-					isBlack=true;
+					JOptionPane.showMessageDialog(this, "当前位置已有棋子，请重新落子：");
 				}
-			}
-			else
-			{
-				JOptionPane.showMessageDialog(this, "当前位置已有棋子，请重新落子：");
 			}
 		}
 	}
-
 	@Override
 	public void mouseReleased(MouseEvent e) {
 		// TODO Auto-generated method stub
@@ -182,5 +191,66 @@ public class FiveChessFrame extends JFrame implements MouseListener
 		// TODO Auto-generated method stub
 
 	}
-
+	
+	public boolean checkWin() 
+	{
+		boolean flag=false;//判断默认未结束
+		//保存共有几个相同颜色的棋子相连
+		int count=1;
+		//判断横向是否有五个棋子相连
+		int color=allChess[x][y];
+		int i=1;
+		while(color==allChess[x+i][y]&&(x+i)<num)
+		{
+			count++;
+			i++;
+		}
+		i=1;
+		while(color==allChess[x-i][y]&&(x-i)>=0)
+		{
+			count++;
+			i++;
+		}
+		if(count>=5)
+		{
+			flag=true;
+		}
+		//判断纵向是否有五个棋子相连
+		int count2=1;
+		int i2=1;
+		while(color==allChess[x][y+i2]&&(y+i2)<num)
+		{
+			count2++;
+			i2++;
+		}
+		i2=1;
+		while(color==allChess[x][y-i2]&&(y-i2)>=0)
+		{
+			count2++;
+			i2++;
+		}
+		if(count2>=5)
+		{
+			flag=true;
+		}
+		//判断斜向是否有五个棋子相连
+		int count3=1;
+		int i3=1;
+		while(color==allChess[x+i3][y+i3]&&(y+i3)<num&&(x+i3)<num)
+		{
+			count3++;
+			i3++;
+		}
+		i3=1;
+		while(color==allChess[x-i3][y-i3]&&(y-i3)>=0&&(x-i3)>=0)
+		{
+			count3++;
+			i3++;
+		}
+		if(count3>=5)
+		{
+			flag=true;
+		}
+		return flag;
+	}
 }
