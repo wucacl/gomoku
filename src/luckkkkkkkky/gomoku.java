@@ -1,20 +1,17 @@
 package luckkkkkkkky;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+
 import java.awt.Toolkit;
 public class gomoku 
 {
 	public static void main(String[] args)
 	{
-		JFrame frame =new JFrame();
-		frame.setTitle("gomoku");
-		frame.setSize(1000, 700);
-		frame.setVisible(true);
-		frame.setResizable(true);//设置窗口大小是否可以改变
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);//关闭窗口时结束进程
-		frame.setLocationRelativeTo(null);//居中
-		int width=Toolkit.getDefaultToolkit().getScreenSize().width;
-		int height=Toolkit.getDefaultToolkit().getScreenSize().height;//得到屏幕高度宽度保证窗口在正中央
-		//frame.setLocation((width-600)/2 , (height-400)/2);
+		FiveChessFrame ff=new FiveChessFrame();
+		/*MyChessFrame mf=new MyChessFrame();
+		JOptionPane.showConfirmDialog(mf, "my message:");//显示一个对话框，主要用来提示信息
+		JOptionPane.showConfirmDialog(mf, "are you ready for begining the game?");
+		JOptionPane.showInputDialog("please enter your name：");*/
 	}
 	
 }
